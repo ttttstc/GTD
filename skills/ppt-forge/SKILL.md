@@ -158,6 +158,7 @@ description: |
 | 品牌 | 模板路径 | 特征 |
 |------|---------|------|
 | 华为 | refs/huawei/template.md | 红/黑/灰、直角体系、高密度 |
+| ZaraPPT | refs/zarappt/template.md | 12种预设、动画丰富、代码友好 |
 | Apple | （待扩展） | 极简、大量留白 |
 | 阿里 | （待扩展） | 橙/科技蓝、Dashboard |
 | 通用 | — | 可配置，根据 brief 调整 |
@@ -177,3 +178,7 @@ description: |
 | refs/huawei/huawei-brand.md | 华为视觉规范 |
 | refs/huawei/huawei-archetypes.md | 华为页型模板 |
 | refs/huawei/huawei-density-rules.md | 华为密度标准 |
+| refs/zarappt/template.md | ZaraPPT 品牌模板 |
+| refs/zarappt/zarappt-presets.md | 12 种视觉预设 |
+| refs/zarappt/zarappt-viewport.css | 视口适配 CSS |
+| refs/zarappt/zarappt-animation.md | 动画系统 |
