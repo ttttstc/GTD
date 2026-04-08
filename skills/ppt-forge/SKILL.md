@@ -28,13 +28,14 @@ description: |
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
+| **输出格式** | 单文件完整版还是分页 | **HTML 单文件** / **PPTX 单文件** / 分页 HTML |
 | 页型（archetype） | 决定密度、字号矩阵和信息组织方式 | 战略总览 / 数据洞察 / 方案对比 / 汇报页 |
 | 品牌 | 对标公司的视觉基因 | 华为 / Apple / 阿里 / 通用 |
 | 受众 | 谁看这个 PPT | CTO / 投资人 / 技术团队 / 客户 |
 | 场景 | PPT 用在哪 | 年会汇报 / 客户提案 / 内部分享 / 产品发布 |
 | 主观看模式 | 影响字号/密度/留白标准 | presentation（大屏投影）/ document（PDF 阅读） |
 
-**没有开局参数 = 开工和审查都没有标准。开局前必须先锁这 5 项。**
+**没有开局参数 = 开工和审查都没有标准。开局前必须先锁这 6 项。**
 
 ## 场景路由
 
@@ -44,7 +45,7 @@ description: |
 | 大纲确认 | **S: 风格定调** | Author 做 + Review 审 | refs/ppt-style-tile.md |
 | 风格确认 | **A: Slide 批量制作** | Author | refs/ppt-slide-authoring.md |
 | Slide 做完 | **R: 视觉审查** | Layout Review (D1) + Brand Review (D2) | refs/ppt-visual-review.md |
-| 审查通过 | **E: 导出验证** | Author | refs/ppt-delivery.md |
+| 审查通过 | **E: 导出/组装** | Author | refs/ppt-delivery.md |
 | 导出验证通过 | **D: 交付** | Author | refs/ppt-delivery.md |
 | 需要对比竞品 | **B: Benchmark 对拍** | Author | refs/ppt-visual-review.md |
 | 用户不满意 / 连续 2 轮 P1>0 | **Reset: 翻盘重来** | — | 回到 P 阶段重新规划 |
@@ -128,22 +129,79 @@ description: |
 
 ## 交付物清单
 
-| 格式 | 说明 |
-|------|------|
-| HTML | 浏览器内打开预览 |
-| PNG 截图 | 存档 + 用户确认 |
-| PPTX | 可选，需导出验证通过 |
-| PDF | 可选，需导出验证通过 |
+根据开局参数的**输出格式**，生成对应单文件：
+
+| 格式 | 说明 | 文件特征 |
+|------|------|---------|
+| **HTML 单文件** | 完整 PPT，所有 slide 内嵌在一个 HTML 中 | `*.html`，可用浏览器直接打开，支持翻页 |
+| **PPTX 单文件** | 完整 PPT，所有 slide 内嵌在一个 PPTX 中 | `*.pptx`，可用 PowerPoint/WPS 直接打开 |
+| 分页 HTML | 每个 slide 一个文件 | `01.html`, `02.html`...（仅用于审查阶段） |
+
+**默认输出：HTML 单文件**。用户明确要求 .pptx 时生成 PPTX 版本。
 
 ## Common Mistakes
 
 | 错误 | 后果 | 修复 |
 |------|------|------|
-| 没声明开局参数 | 开工和审查没有标准 | 开工前锁 5 参数 |
+| 没声明开局参数 | 开工和审查没有标准 | 开工前锁 6 参数（含输出格式） |
 | 20 页全做完才审 | 返工成本爆炸 | S 阶段：先做 1-2 页核心页定调 |
 | 自己说"没问题"不截图 | 布局 bug 漏检 | 自检必须截图看一遍再交活 |
 | 审查只给截图没给 HTML | 只能说"这里怪" | 必须带 6 件套 |
+| 生成多个 HTML 而非单文件 | 用户需要逐个打开 | E 阶段必须组装为 reveal.js 单文件 |
+| PPTX 字号没换算 | 文字太小不可读 | CSS_px × 0.75 = PPTX_pt |
 | 跳过 Export Gate | 导出后不可编辑/乱码 | 独立验证导出质量 |
+
+## 品牌模板
+
+品牌模板是特定公司的视觉规范预设，选择品牌后自动应用对应规范：
+
+| 品牌 | 模板路径 | 特征 |
+|------|---------|------|
+| 华为 | refs/huawei/template.md | 红/黑/灰、直角体系、高密度 |
+| ZaraPPT | refs/zarappt/template.md | 12种预设、滚动驱动、SlidePresentation JS、Fontshare字体 |
+| Apple | （待扩展） | 极简、大量留白 |
+| 阿里 | （待扩展） | 橙/科技蓝、Dashboard |
+| 通用 | — | 可配置，根据 brief 调整 |
+
+**使用**：开局参数选择品牌后 → S 阶段风格定调时使用对应模板的 CSS 变量
+
+### ZaraPPT 特殊说明
+
+选择 ZaraPPT 时，**必须继承 frontend-slides 核心原则**：
+
+| 原则 | 要求 |
+|------|------|
+| Zero-dependency | 单 HTML 文件，内联 CSS/JS，无外部依赖 |
+| 强制视口适配 | 每个 `.slide` 必须 `height: 100vh; overflow: hidden` |
+| Fontshare 字体 | 禁止系统字体，必须用在线字体 |
+| clamp() 字号 | 所有字号必须用 `clamp(min, preferred, max)` |
+| .visible 动画 | 动画通过 IntersectionObserver + `.visible` 类触发 |
+| SlidePresentation JS | 必须包含键盘/触摸/进度条导航 |
+
+### ZaraPPT 风格选择流程（S 阶段）
+
+**"Show, Don't Tell" — 风格不是选出来的，是看出来的。**
+
+1. **问用户想要什么感受**（单选，最多 2 个）：
+   - Impressed/Confident — 专业、可信赖
+   - Excited/Energized — 创新、大胆
+   - Calm/Focused — 清晰、专注
+   - Inspired/Moved — 情感、有记忆点
+
+2. **根据感受推荐预设**（详见 `refs/zarappt/zarappt-presets.md`）：
+
+   | 感受 | 推荐预设 |
+   |------|---------|
+   | Impressed/Confident | Bold Signal, Electric Studio, Dark Botanical |
+   | Excited/Energized | Creative Voltage, Neon Cyber, Split Pastel |
+   | Calm/Focused | Notebook Tabs, Paper & Ink, Swiss Modern |
+   | Inspired/Moved | Dark Botanical, Vintage Editorial, Pastel Geometry |
+
+3. **生成 3 个风格预览**（可选）：为用户生成单页 HTML 预览，展示字体、颜色、动画效果
+
+4. **用户选择或混搭**：确定最终风格后进入 A 阶段
+
+详见 `refs/zarappt/html-template.md`
 
 ## 参考文档
 
@@ -154,3 +212,12 @@ description: |
 | refs/ppt-visual-review.md | 视觉审查 Gate |
 | refs/ppt-delivery.md | 交付流程 |
 | refs/ppt-density-playbook.md | 密度填充手册 |
+| refs/huawei/template.md | 华为品牌模板 |
+| refs/huawei/huawei-brand.md | 华为视觉规范 |
+| refs/huawei/huawei-archetypes.md | 华为页型模板 |
+| refs/huawei/huawei-density-rules.md | 华为密度标准 |
+| refs/zarappt/template.md | ZaraPPT 品牌模板 |
+| refs/zarappt/zarappt-presets.md | 12 种视觉预设 |
+| refs/zarappt/zarappt-viewport.css | 视口适配 CSS |
+| refs/zarappt/zarappt-animation.md | 动画系统 |
+| refs/zarappt/html-template.md | HTML 架构规范 + SlidePresentation JS |

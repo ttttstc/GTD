@@ -17,24 +17,32 @@
 
 | 参数 | 来源 | 示例 |
 |------|------|------|
+| **输出格式** | 用户选择 | HTML 单文件 / PPTX 单文件 |
 | archetype | 用户/内容规划 | 架构总览 / 数据洞察 / 方案对比 |
 | viewing mode | 用户确认 | presentation（大屏）/ document（阅读） |
 | 品牌 | 主 skill 开局 | 华为 / Apple / 阿里 / 通用 |
 | 本页目的 | 一句话 | "证明对等判断优于中央编排" |
 | 证据源 | 明确列出 | `03-architecture.md` + git log |
 
-**没有这 5 项 = 不许动手画。**
+**没有这 7 项 = 不许动手画。**
+
+> **ZaraPPT 额外要求**：选择 ZaraPPT 时，还必须确认：
+> - **预设**：从 12 种预设中选择（BOLD SIGNAL / TERMINAL GREEN 等）
+> - **渲染架构**：scroll-snap（原生滚动驱动）
 
 ## 制作流程
 
 ```
 1. 读证据源，提取核心数据和论点
 2. 选 archetype 模板（见 ppt-density-playbook.md 页面构成模板）
-3. 画 HTML（1280×720 fixed viewport）
+3. 画 HTML（1280×720 fixed viewport，每个 slide 独立文件）
 4. 跑 Pre-flight Checklist（见下方）
 5. 截图自检（必须自己看一遍渲染结果）
-6. 通过 → 交活；不通过 → 改到通过
+6. 通过 → 存到 slides/ 目录；不通过 → 改到通过
+7. 所有 slide 完成后 → E 阶段组装为单文件（见 ppt-delivery.md）
 ```
+
+**注意**：制作阶段每个 slide 是独立的 HTML 文件，便于审查和修改。最终交付前会在 E 阶段组装为 HTML 单文件或 PPTX 单文件。
 
 ## Pre-flight Checklist ★
 
@@ -65,6 +73,14 @@
 - [ ] 0 overflow？（`el.scrollHeight > el.clientHeight + 2` 全 slide 扫描）
 - [ ] 图片路径在 HTTP server 环境下能正常加载？
 - [ ] 渲染截图已保存？（自检必须截图看一遍再交活）
+
+### ZaraPPT 专项检查（当品牌=ZaraPPT 时必须检查）
+
+- [ ] **视口检查**：每个 `.slide` 有 `height: 100vh; height: 100dvh; overflow: hidden`
+- [ ] **字体检查**：用了 Fontshare/Google Fonts（`<link>` 标签），没有使用系统字体
+- [ ] **动画检查**：动画通过 `.visible` class + IntersectionObserver 触发
+- [ ] **Scroll Snap 检查**：`html` 有 `scroll-snap-type: y mandatory`
+- [ ] **SlidePresentation JS**：包含键盘/触摸/进度条导航
 
 ## 素材使用
 

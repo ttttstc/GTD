@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeFlow：让 AI 编码回到工程交付的主线上</title>
+
+    <!-- Fonts: Bold Signal uses Archivo Black + Space Grotesk -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (BOLD SIGNAL THEME)
+           =========================================== */
+        :root {
+            /* Bold Signal Colors */
+            --bg-primary: #1a1a1a;
+            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            --card-bg: #FF5722;
+            --card-bg-alt: #E64A19;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-on-card: #1a1a1a;
+            --accent: #FFC857;
+            --accent-glow: rgba(255, 87, 34, 0.4);
+
+            /* Typography — MUST use clamp() */
+            --font-display: 'Archivo Black', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --title-size: clamp(1.5rem, 5vw, 4rem);
+            --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+            --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+            --small-size: clamp(0.65rem, 1vw, 0.875rem);
+
+            /* Spacing — MUST use clamp() */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(1rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           VIEWPORT BASE STYLES (MANDATORY)
+           Copied from viewport-base.css
+           =========================================== */
+
+        /* 1. Lock html/body to viewport */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* 2. Each slide = exact viewport height */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 3. Content container with flex for centering */
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        /* 4. Cards/containers use viewport-relative max sizes */
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px);
+            max-height: min(80vh, 700px);
+        }
+
+        /* 5. Lists auto-scale with viewport */
+        .feature-list, .bullet-list {
+            gap: clamp(0.4rem, 1vh, 1rem);
+        }
+
+        .feature-list li, .bullet-list li {
+            font-size: var(--body-size);
+            line-height: 1.4;
+        }
+
+        /* 6. Grids adapt to available space */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+
+        /* 7. Images constrained to viewport */
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative {
+                display: none;
+            }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           Trigger via .visible class (added by JS on scroll)
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger children for sequential reveal */
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* ===========================================
+           BOLD SIGNAL PRESET STYLES
+           =========================================== */
+
+        /* Background with gradient */
+        .slide {
+            background: var(--bg-gradient);
+        }
+
+        /* Header bar */
+        .header-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-bg);
+        }
+
+        /* Section label */
+        .section-label {
+            font-family: var(--font-body);
+            font-size: var(--small-size);
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: clamp(0.5rem, 1vh, 1rem);
+        }
+
+        /* Title styles */
+        .slide-title {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: var(--content-gap);
+            line-height: 1.2;
+        }
+
+        .slide-title .accent {
+            color: var(--card-bg);
+        }
+
+        /* Card styles */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .card.accent-left {
+            border-left: 3px solid var(--card-bg);
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+            font-weight: 900;
+            color: var(--card-bg);
+            margin-bottom: clamp(0.4rem, 0.8vh, 0.8rem);
+        }
+
+        .card-text {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--content-gap);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--element-gap);
+        }
+
+        /* Lists */
+        .content-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .content-list li {
+            position: relative;
+            padding-left: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(0.6rem, 1.2vh, 1rem);
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .content-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: clamp(0.4rem, 0.8vh, 0.7rem);
+            width: clamp(0.3rem, 0.5vw, 0.5rem);
+            height: clamp(0.3rem, 0.5vw, 0.5rem);
+            background: var(--card-bg);
+            border-radius: 50%;
+        }
+
+        .content-list li strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Quote box */
+        .quote-box {
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.15), rgba(255, 200, 87, 0.1));
+            border-left: 4px solid var(--card-bg);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            margin: var(--content-gap) 0;
+        }
+
+        .quote-text {
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Flow diagram */
+        .flow-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(0.25rem, 0.5vw, 0.5rem);
+            padding: clamp(1rem, 2vh, 1.5rem);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin: var(--content-gap) 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: var(--card-bg);
+            color: var(--text-on-card);
+            padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.6rem, 1.2vw, 1rem);
+            font-family: var(--font-body);
+            font-size: var(--small-size);
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .flow-step.alt {
+            background: var(--card-bg-alt);
+        }
+
+        .flow-arrow {
+            color: var(--accent);
+            font-size: clamp(0.8rem, 1.2vw, 1.2rem);
+            font-weight: bold;
+        }
+
+        /* Table */
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--small-size);
+        }
+
+        .content-table th {
+            background: var(--card-bg);
+            color: var(--text-on-card);
+            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.6rem, 1vw, 1rem);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .content-table td {
+            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.6rem, 1vw, 1rem);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .content-table tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .content-table .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: clamp(0.5rem, 1vh, 1rem);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           COVER SLIDE
+           =========================================== */
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cover-slide .slide-content {
+            align-items: center;
+        }
+
+        .cover-slide .main-title {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: var(--content-gap);
+            letter-spacing: 0.02em;
+        }
+
+        .cover-slide .main-title .accent {
+            color: var(--card-bg);
+        }
+
+        .cover-slide .subtitle {
+            font-family: var(--font-body);
+            font-size: var(--h3-size);
+            color: var(--text-secondary);
+            margin-bottom: var(--content-gap);
+        }
+
+        .cover-slide .meta {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+
+        /* Brand bar at bottom */
+        .brand-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-bg), var(--accent), var(--card-bg-alt));
+        }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 2vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.6rem);
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: clamp(6px, 0.8vw, 8px);
+            height: clamp(6px, 0.8vw, 8px);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--card-bg);
+            transform: scale(1.3);
+        }
+
+        .nav-dot:hover {
+            background: var(--accent);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--card-bg);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(1rem, 2vh, 1.5rem);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ===========================================
+           RESPONSIVE OVERRIDES
+           =========================================== */
+        @media (max-width: 900px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint">Use arrow keys or scroll to navigate</div>
+
+    <!-- =========================================
+         SLIDE 1: COVER
+         ========================================= -->
+    <section class="slide cover-slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">技术分享</p>
+            <h1 class="main-title reveal">VibeFlow</h1>
+            <p class="subtitle reveal">让 AI 编码回到工程交付的主线上</p>
+            <p class="meta reveal">30 分钟 · 适合所有对 AI 辅助开发感兴趣的同学</p>
+        </div>
+        <div class="brand-bar"></div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: TABLE OF CONTENTS
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">目录</p>
+            <h2 class="slide-title reveal">今天聊什么</h2>
+            <div class="grid-2" style="margin-top: var(--content-gap);">
+                <div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">01</div>
+                        <div class="card-text">先聊几个概念（SDD、Harness、控制面）</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">02</div>
+                        <div class="card-text">我们到底遇到了什么问题</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">03</div>
+                        <div class="card-text">VibeFlow 的思路：管流程，不管写代码</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">04</div>
+                        <div class="card-text">八个阶段，一条交付线</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">05</div>
+                        <div class="card-text">三个工程约束，让流程真正可信</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">06</div>
+                        <div class="card-text">横向对比：业界在做什么</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">07</div>
+                        <div class="card-text">怎么扩展：模板、技能、规则</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">08</div>
+                        <div class="card-text">工程化落地建议</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>2 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: CONCEPTS
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 01</p>
+            <h2 class="slide-title reveal">先聊几个<span class="accent">概念</span></h2>
+            <div class="grid-3" style="margin-top: var(--content-gap);">
+                <div class="card reveal">
+                    <div class="card-title">SDD</div>
+                    <div class="card-text">规格驱动开发<br><br>每次改动必须先有明确的规格说明，然后再动手。不在对话框里临场发挥。</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">Harness</div>
+                    <div class="card-text">约束框架<br><br>让 AI 在预设的规则内工作。"写完代码必须跑测试"——这些都是 Harness。</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">控制面 vs 执行层</div>
+                    <div class="card-text">分拣中心 vs 快递员<br><br>Claude Code 是执行层，VibeFlow 是控制面。管调度，不管写代码。</div>
+                </div>
+            </div>
+            <div class="quote-box reveal" style="margin-top: var(--content-gap);">
+                <div class="quote-text">这三个概念搞清楚了，后面的内容就好理解了。</div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>3 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: PROBLEMS
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 02</p>
+            <h2 class="slide-title reveal">我们到底遇到了<span class="accent">什么问题</span></h2>
+            <div class="quote-box reveal">
+                <div class="quote-text">不是 AI 写不好代码，是整个链路没人管。</div>
+            </div>
+            <ul class="content-list" style="margin-top: var(--content-gap);">
+                <li class="reveal"><strong>痛点一：没想清楚就开干了。</strong> 需求描述就一句话，AI 只能猜你要什么。</li>
+                <li class="reveal"><strong>痛点二：设计没有评审环节。</strong> AI 给方案就直接实现，没人问"这个方案合理吗"。</li>
+                <li class="reveal"><strong>痛点三：流程走到一半断了，续不上。</strong> 进度存在聊天记录里，窗口一关就没了。</li>
+                <li class="reveal"><strong>痛点四：AI 不知道该看哪些文件。</strong> 项目大一点，要么全读浪费 token，要么漏掉关键信息。</li>
+                <li class="reveal"><strong>痛点五：过程文件满天飞。</strong> 需求文档、设计文档、测试报告散落各处。</li>
+                <li class="reveal"><strong>痛点六：框架写死了没法推广。</strong> A 团队好用，到 B 团队就水土不服。</li>
+            </ul>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>4 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: PHILOSOPHY
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 03</p>
+            <h2 class="slide-title reveal">VibeFlow 的思路</h2>
+            <div class="quote-box reveal">
+                <div class="quote-text">VibeFlow 把 AI 编码从"聊天里临场发挥"，变成"按交付流程推进"。</div>
+            </div>
+            <div style="margin-top: var(--content-gap);">
+                <h3 class="reveal" style="color: var(--card-bg); font-size: var(--h3-size); margin-bottom: clamp(0.5rem, 1vh, 0.8rem);">四条设计原则</h3>
+                <ul class="content-list">
+                    <li class="reveal"><strong>只自动化有确定答案的事。</strong> "当前该进入哪个阶段"可以判断，"架构方案好不好"不能。</li>
+                    <li class="reveal"><strong>流程骨架必须稳定可复现。</strong> 阶段流转用确定性脚本，不依赖 AI 临场发挥。</li>
+                    <li class="reveal"><strong>只拦截"忘了就很贵"的事。</strong> 跳过设计/测试设硬卡点，过不了不让走。</li>
+                    <li class="reveal"><strong>其他的都不管。</strong> 代码怎么写、用什么设计模式——这些 AI 擅长，留给它。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>5 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 6: EIGHT STAGES
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 04</p>
+            <h2 class="slide-title reveal">八个阶段，一条<span class="accent">交付线</span></h2>
+            <div class="flow-row reveal">
+                <span class="flow-step">Spark</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step alt">Design</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Tasks</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step alt">Build</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Review</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step alt">Test</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">Ship</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step alt">Reflect</span>
+            </div>
+            <div class="grid-2" style="margin-top: var(--content-gap);">
+                <div>
+                    <h3 class="reveal" style="color: var(--card-bg); font-size: var(--body-size); margin-bottom: clamp(0.4rem, 0.8vh, 0.6rem);">前三个阶段：人参与决策</h3>
+                    <ul class="content-list" style="font-size: 0.9em;">
+                        <li class="reveal"><strong>Spark：</strong>把模糊想法变清晰目标</li>
+                        <li class="reveal"><strong>Design：</strong>方案比选，立下契约</li>
+                        <li class="reveal"><strong>Tasks：</strong>拆成 AI 能一口吃下的块</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="reveal" style="color: var(--card-bg); font-size: var(--body-size); margin-bottom: clamp(0.4rem, 0.8vh, 0.6rem);">后五个阶段：自动往下跑</h3>
+                    <ul class="content-list" style="font-size: 0.9em;">
+                        <li class="reveal"><strong>Build：</strong>按契约构建，逐功能过关</li>
+                        <li class="reveal"><strong>Review：</strong>三维度检查代码</li>
+                        <li class="reveal"><strong>Test：</strong>系统级测试验证</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>6 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 7: THREE CONSTRAINTS
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 05</p>
+            <h2 class="slide-title reveal">三个工程<span class="accent">约束</span></h2>
+            <div class="grid-3" style="margin-top: var(--content-gap);">
+                <div class="card reveal">
+                    <div class="card-title">文件驱动</div>
+                    <div class="card-text">进度存在代码仓库里，不在聊天记录里。<br><br>所有状态存成文件，可审计、可追溯。关掉终端再打开，自动恢复到上次位置。</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">质量门禁</div>
+                    <div class="card-text">覆盖率 ≥ 90%<br>分支覆盖率 ≥ 80%<br>变异测试得分 ≥ 80%<br><br>变异测试检验测试本身的质量，不只是"跑没跑通"。</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">阶段不可变</div>
+                    <div class="card-text">不能无审批回退<br>门禁不可绕过<br>历史只能追加<br><br>Quick 模式：低风险改动走压缩流程。</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>7 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 8: COMPARISON
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 06</p>
+            <h2 class="slide-title reveal">横向对比：业界在<span class="accent">做什么</span></h2>
+            <table class="content-table reveal" style="margin-top: var(--content-gap);">
+                <thead>
+                    <tr>
+                        <th>框架</th>
+                        <th>一句话定位</th>
+                        <th>VibeFlow 的做法</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OpenSpec</td>
+                        <td>规格先行</td>
+                        <td rowspan="5" class="highlight" style="vertical-align: middle; background: rgba(255, 200, 87, 0.1);">Spark 到 Reflect 八阶段完整覆盖</td>
+                    </tr>
+                    <tr>
+                        <td>Superpowers</td>
+                        <td>方法论注入（TDD、调试）</td>
+                    </tr>
+                    <tr>
+                        <td>GSD</td>
+                        <td>上下文工程</td>
+                    </tr>
+                    <tr>
+                        <td>OMC</td>
+                        <td>多智能体编排</td>
+                    </tr>
+                    <tr>
+                        <td>ECC</td>
+                        <td>增强系统（记忆+自学习）</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="quote-box reveal" style="margin-top: var(--content-gap); padding: clamp(0.8rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.25rem);">
+                <div class="quote-text" style="font-size: var(--small-size);">VibeFlow 的强项是交付闭环——从规格到发布，一条线走到底。</div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>8 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 9: EXTENSION
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 07</p>
+            <h2 class="slide-title reveal">怎么扩展：<span class="accent">模板 · 技能 · 规则</span></h2>
+            <div class="grid-3" style="margin-top: var(--content-gap);">
+                <div class="card reveal">
+                    <div class="card-title">模板</div>
+                    <div class="card-text">定义"做不做"和"做到什么程度"<br><br>原型 / Web标准 / API标准 / 企业级</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">技能</div>
+                    <div class="card-text">定义"怎么做"<br><br>每个阶段的具体行为由技能文件控制，可替换默认技能。</div>
+                </div>
+                <div class="card reveal">
+                    <div class="card-title">规则</div>
+                    <div class="card-text">定义"不能违反什么"<br><br>项目级编码约束，审查时验证。</div>
+                </div>
+            </div>
+            <div class="reveal" style="text-align: center; margin-top: var(--content-gap); color: var(--text-secondary); font-size: var(--small-size);">
+                模板（项目级）→ 技能（阶段级）→ 规则（代码级）<br>
+                <span style="color: var(--accent);">三层独立演进，互不耦合</span>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>9 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 10: IMPLEMENTATION
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">Part 08</p>
+            <h2 class="slide-title reveal">工程化<span class="accent">落地建议</span></h2>
+            <div class="grid-2" style="margin-top: var(--content-gap);">
+                <div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">第一步：单人试点（1-2周）</div>
+                        <div class="card-text">选"Web标准"模板，认真走完 Spark 和 Design，不要急着跳到 Build。完整走到 Reflect 阶段回顾一次。</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">第二步：小团队适配（2-4周）</div>
+                        <div class="card-text">根据团队技术栈定制模板和规则。把模板和规则纳入代码仓库版本管理。</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">第三步：建立团队标准库（4-8周）</div>
+                        <div class="card-text">沉淀可复用资产：模板库 / 技能库 / 规则库。新项目直接引用。</div>
+                    </div>
+                    <div class="card accent-left reveal">
+                        <div class="card-title">第四步：度量驱动优化</div>
+                        <div class="card-text">一次通过率 / 缺陷密度 / 断点续跑频率。这些指标用来发现哪个环节需要改进。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>10 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 11: SUMMARY
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">回顾</p>
+            <h2 class="slide-title reveal">VibeFlow 做的事，说白了就<span class="accent">三件</span></h2>
+            <div style="margin-top: var(--content-gap);">
+                <div class="card reveal" style="border-left: 3px solid var(--card-bg); margin-bottom: var(--element-gap);">
+                    <div class="card-title">一</div>
+                    <div class="card-text">把一次 AI 编码组织成八阶段的交付线，前面想清楚后面自动跑</div>
+                </div>
+                <div class="card reveal" style="border-left: 3px solid var(--card-bg-alt); margin-bottom: var(--element-gap);">
+                    <div class="card-title">二</div>
+                    <div class="card-text">靠文件驱动、质量门禁、阶段不可变三个约束让这条线可靠</div>
+                </div>
+                <div class="card reveal" style="border-left: 3px solid var(--accent); margin-bottom: var(--content-gap);">
+                    <div class="card-title">三</div>
+                    <div class="card-text">用模板、技能、规则三层体系让它能适配不同团队</div>
+                </div>
+            </div>
+            <div class="quote-box reveal" style="background: rgba(26, 26, 26, 0.9);">
+                <div class="quote-text" style="font-size: var(--body-size);">不替 AI 写代码，不跟底层工具抢活，就管一件事 ——<br><strong>让 AI 的产出能走完从想法到上线的全过程。</strong></div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>11 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 12: Q&A
+         ========================================= -->
+    <section class="slide">
+        <div class="header-bar"></div>
+        <div class="slide-content">
+            <p class="section-label reveal">讨论</p>
+            <h2 class="slide-title reveal">开放<span class="accent">问题</span></h2>
+            <div style="margin-top: var(--content-gap);">
+                <div class="card reveal" style="margin-bottom: var(--element-gap);">
+                    <div class="card-title">Q1</div>
+                    <div class="card-text">AI 越来越自主之后，我们应该给它更多自由度还是更强的约束？<br><br><span style="color: var(--text-secondary); font-size: 0.85em;">我们目前的判断：自由度给执行层，约束给流程层。但这个平衡会随着 AI 能力变化而变。</span></div>
+                </div>
+                <div class="card reveal" style="margin-bottom: var(--element-gap);">
+                    <div class="card-title">Q2</div>
+                    <div class="card-text">质量门禁的标准谁来定？框架预设的标准适合多数场景，但每个团队实际情况不同。</div>
+                </div>
+                <div class="card reveal" style="margin-bottom: var(--content-gap);">
+                    <div class="card-title">Q3</div>
+                    <div class="card-text">当前 VibeFlow 是单项目工具。如果要变成团队基础设施，需要解决什么问题？</div>
+                </div>
+            </div>
+            <div class="reveal" style="text-align: center; margin-top: var(--content-gap);">
+                <span style="color: var(--card-bg); font-size: var(--h2-size); font-weight: 900;">欢迎提问</span>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>VibeFlow 技术分享</span>
+            <span>12 / 12</span>
+        </div>
+    </section>
+
+    <!-- =========================================
+         JAVASCRIPT: SLIDE PRESENTATION CONTROLLER
+         ========================================= -->
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.isScrolling = false;
+
+                this.init();
+            }
+
+            init() {
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+                this.markVisible(0);
+            }
+
+            setupIntersectionObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.5
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const index = Array.from(this.slides).indexOf(entry.target);
+                            this.currentSlide = index;
+                            this.updateProgress();
+                            this.updateNavDots();
+                        }
+                    });
+                }, options);
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            setupProgressBar() {
+                const progressBar = document.getElementById('progressBar');
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    const progress = (scrollTop / docHeight) * 100;
+                    progressBar.style.width = progress + '%';
+                });
+            }
+
+            setupNavDots() {
+                const navDots = document.getElementById('navDots');
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot' + (index === 0 ? ' active' : '');
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    navDots.appendChild(dot);
+                });
+            }
+
+            updateProgress() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            markVisible(index) {
+                this.slides[index].classList.add('visible');
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                this.currentSlide = index;
+                this.updateProgress();
+                this.updateNavDots();
+            }
+        }
+
+        // Initialize presentation
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+        });
+    </script>
+</body>
+</html>
