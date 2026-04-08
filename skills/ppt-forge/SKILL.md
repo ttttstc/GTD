@@ -145,6 +145,19 @@ description: |
 | 审查只给截图没给 HTML | 只能说"这里怪" | 必须带 6 件套 |
 | 跳过 Export Gate | 导出后不可编辑/乱码 | 独立验证导出质量 |
 
+## 品牌模板
+
+品牌模板是特定公司的视觉规范预设，选择品牌后自动应用对应规范：
+
+| 品牌 | 模板路径 | 特征 |
+|------|---------|------|
+| 华为 | refs/huawei/template.md | 红/黑/灰、直角体系、高密度 |
+| Apple | （待扩展） | 极简、大量留白 |
+| 阿里 | （待扩展） | 橙/科技蓝、Dashboard |
+| 通用 | — | 可配置，根据 brief 调整 |
+
+**使用**：开局参数选择品牌后 → S 阶段风格定调时使用对应模板的 CSS 变量
+
 ## 参考文档
 
 | 文档 | 内容 |
@@ -154,3 +167,7 @@ description: |
 | refs/ppt-visual-review.md | 视觉审查 Gate |
 | refs/ppt-delivery.md | 交付流程 |
 | refs/ppt-density-playbook.md | 密度填充手册 |
+| refs/huawei/template.md | 华为品牌模板 |
+| refs/huawei/huawei-brand.md | 华为视觉规范 |
+| refs/huawei/huawei-archetypes.md | 华为页型模板 |
+| refs/huawei/huawei-density-rules.md | 华为密度标准 |
