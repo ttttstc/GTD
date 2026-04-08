@@ -439,3 +439,45 @@
 | 产品介绍 | Electric Studio, Creative Voltage |
 | 设计提案 | Pastel Geometry, Split Pastel |
 | 历史回顾 | Vintage Editorial, Dark Botanical |
+
+---
+
+## 字体配对速查表
+
+| 预设 | Display Font | Body Font | 来源 |
+|------|-------------|-----------|------|
+| Bold Signal | Archivo Black | Space Grotesk | Google |
+| Electric Studio | Manrope | Manrope | Google |
+| Creative Voltage | Syne | Space Mono | Google |
+| Dark Botanical | Cormorant | IBM Plex Sans | Google |
+| Notebook Tabs | Bodoni Moda | DM Sans | Google |
+| Pastel Geometry | Plus Jakarta Sans | Plus Jakarta Sans | Google |
+| Split Pastel | Outfit | Outfit | Google |
+| Vintage Editorial | Fraunces | Work Sans | Google |
+| Neon Cyber | Clash Display | Satoshi | Fontshare |
+| Terminal Green | JetBrains Mono | JetBrains Mono | JetBrains |
+| Swiss Modern | Archivo | Nunito | Google |
+| Paper & Ink | Cormorant Garamond | Source Serif 4 | Google |
+
+---
+
+## 感受与预设映射
+
+| 感受 | 推荐预设 |
+|------|---------|
+| Impressed/Confident（专业、可信赖） | Bold Signal, Electric Studio, Dark Botanical |
+| Excited/Energized（创新、大胆） | Creative Voltage, Neon Cyber, Split Pastel |
+| Calm/Focused（清晰、专注） | Notebook Tabs, Paper & Ink, Swiss Modern |
+| Inspired/Moved（情感、有记忆点） | Dark Botanical, Vintage Editorial, Pastel Geometry |
+
+---
+
+## 禁止使用（通用 AI 模式）
+
+**字体**: Inter, Roboto, Arial, 系统字体作为标题
+
+**颜色**: `#6366f1`（通用靛蓝），白色背景上的紫色渐变
+
+**布局**: 全部居中，通用 hero section，相同的卡片网格
+
+**装饰**: 写实插图，过度的玻璃态，无目的的阴影

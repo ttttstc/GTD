@@ -178,6 +178,29 @@ description: |
 | .visible 动画 | 动画通过 IntersectionObserver + `.visible` 类触发 |
 | SlidePresentation JS | 必须包含键盘/触摸/进度条导航 |
 
+### ZaraPPT 风格选择流程（S 阶段）
+
+**"Show, Don't Tell" — 风格不是选出来的，是看出来的。**
+
+1. **问用户想要什么感受**（单选，最多 2 个）：
+   - Impressed/Confident — 专业、可信赖
+   - Excited/Energized — 创新、大胆
+   - Calm/Focused — 清晰、专注
+   - Inspired/Moved — 情感、有记忆点
+
+2. **根据感受推荐预设**（详见 `refs/zarappt/zarappt-presets.md`）：
+
+   | 感受 | 推荐预设 |
+   |------|---------|
+   | Impressed/Confident | Bold Signal, Electric Studio, Dark Botanical |
+   | Excited/Energized | Creative Voltage, Neon Cyber, Split Pastel |
+   | Calm/Focused | Notebook Tabs, Paper & Ink, Swiss Modern |
+   | Inspired/Moved | Dark Botanical, Vintage Editorial, Pastel Geometry |
+
+3. **生成 3 个风格预览**（可选）：为用户生成单页 HTML 预览，展示字体、颜色、动画效果
+
+4. **用户选择或混搭**：确定最终风格后进入 A 阶段
+
 详见 `refs/zarappt/html-template.md`
 
 ## 参考文档
