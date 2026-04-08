@@ -28,13 +28,14 @@ description: |
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
+| **输出格式** | 单文件完整版还是分页 | **HTML 单文件** / **PPTX 单文件** / 分页 HTML |
 | 页型（archetype） | 决定密度、字号矩阵和信息组织方式 | 战略总览 / 数据洞察 / 方案对比 / 汇报页 |
 | 品牌 | 对标公司的视觉基因 | 华为 / Apple / 阿里 / 通用 |
 | 受众 | 谁看这个 PPT | CTO / 投资人 / 技术团队 / 客户 |
 | 场景 | PPT 用在哪 | 年会汇报 / 客户提案 / 内部分享 / 产品发布 |
 | 主观看模式 | 影响字号/密度/留白标准 | presentation（大屏投影）/ document（PDF 阅读） |
 
-**没有开局参数 = 开工和审查都没有标准。开局前必须先锁这 5 项。**
+**没有开局参数 = 开工和审查都没有标准。开局前必须先锁这 6 项。**
 
 ## 场景路由
 
@@ -44,7 +45,7 @@ description: |
 | 大纲确认 | **S: 风格定调** | Author 做 + Review 审 | refs/ppt-style-tile.md |
 | 风格确认 | **A: Slide 批量制作** | Author | refs/ppt-slide-authoring.md |
 | Slide 做完 | **R: 视觉审查** | Layout Review (D1) + Brand Review (D2) | refs/ppt-visual-review.md |
-| 审查通过 | **E: 导出验证** | Author | refs/ppt-delivery.md |
+| 审查通过 | **E: 导出/组装** | Author | refs/ppt-delivery.md |
 | 导出验证通过 | **D: 交付** | Author | refs/ppt-delivery.md |
 | 需要对比竞品 | **B: Benchmark 对拍** | Author | refs/ppt-visual-review.md |
 | 用户不满意 / 连续 2 轮 P1>0 | **Reset: 翻盘重来** | — | 回到 P 阶段重新规划 |
@@ -128,21 +129,26 @@ description: |
 
 ## 交付物清单
 
-| 格式 | 说明 |
-|------|------|
-| HTML | 浏览器内打开预览 |
-| PNG 截图 | 存档 + 用户确认 |
-| PPTX | 可选，需导出验证通过 |
-| PDF | 可选，需导出验证通过 |
+根据开局参数的**输出格式**，生成对应单文件：
+
+| 格式 | 说明 | 文件特征 |
+|------|------|---------|
+| **HTML 单文件** | 完整 PPT，所有 slide 内嵌在一个 HTML 中 | `*.html`，可用浏览器直接打开，支持翻页 |
+| **PPTX 单文件** | 完整 PPT，所有 slide 内嵌在一个 PPTX 中 | `*.pptx`，可用 PowerPoint/WPS 直接打开 |
+| 分页 HTML | 每个 slide 一个文件 | `01.html`, `02.html`...（仅用于审查阶段） |
+
+**默认输出：HTML 单文件**。用户明确要求 .pptx 时生成 PPTX 版本。
 
 ## Common Mistakes
 
 | 错误 | 后果 | 修复 |
 |------|------|------|
-| 没声明开局参数 | 开工和审查没有标准 | 开工前锁 5 参数 |
+| 没声明开局参数 | 开工和审查没有标准 | 开工前锁 6 参数（含输出格式） |
 | 20 页全做完才审 | 返工成本爆炸 | S 阶段：先做 1-2 页核心页定调 |
 | 自己说"没问题"不截图 | 布局 bug 漏检 | 自检必须截图看一遍再交活 |
 | 审查只给截图没给 HTML | 只能说"这里怪" | 必须带 6 件套 |
+| 生成多个 HTML 而非单文件 | 用户需要逐个打开 | E 阶段必须组装为 reveal.js 单文件 |
+| PPTX 字号没换算 | 文字太小不可读 | CSS_px × 0.75 = PPTX_pt |
 | 跳过 Export Gate | 导出后不可编辑/乱码 | 独立验证导出质量 |
 
 ## 品牌模板
