@@ -23,7 +23,7 @@ description: |
 | 留白 | 最小化 |
 | 字体 | 华为体系：无衬线 geometric，中文用 HarmonyOS Sans / MiSans |
 
-详细规范见 `refs/huawei-brand.md`
+详细规范见 `huawei-brand.md`
 
 ## 典型页型
 
@@ -35,7 +35,7 @@ description: |
 | 对比分析 | 双列/多列对比，展示选项 | 方案对比、选型分析 |
 | 发布会结论 | 简洁有力，单点突出 | 产品发布、对外演讲 |
 
-详细模板见 `refs/huawei-archetypes.md`
+详细模板见 `huawei-archetypes.md`
 
 ## 密度标准
 
@@ -49,7 +49,7 @@ description: |
 | 对比分析 | 25% | 4 | 9px |
 | 发布会结论 | 40% | 2 | 12px |
 
-详细标准见 `refs/huawei-density-rules.md`
+详细标准见 `huawei-density-rules.md`
 
 ## 使用流程
 
@@ -58,11 +58,11 @@ description: |
    → 锁定：archetype / 华为品牌 / 受众 / 场景 / 观看模式
 
 2. S 场景：风格定调
-   → 使用 huawei-brand.md 的 CSS 变量制作核心页
+   → 使用 refs/huawei/huawei-brand.md 的 CSS 变量制作核心页
 
 3. A 场景：Slide 制作
-   → 使用 huawei-archetypes.md 的模板
-   → 遵循 huawei-density-rules.md 的密度标准
+   → 使用 refs/huawei/huawei-archetypes.md 的模板
+   → 遵循 refs/huawei/huawei-density-rules.md 的密度标准
 
 4. R 场景：视觉审查
    → 品牌审查时挂载华为审美滤镜
@@ -95,8 +95,8 @@ description: |
 
 | 文档 | 内容 |
 |------|------|
-| refs/huawei-brand.md | 华为视觉规范（色板/字体/图标/间距） |
-| refs/huawei-archetypes.md | 华为典型页型模板 |
-| refs/huawei-density-rules.md | 华为密度标准 |
-| ../ppt-forge/SKILL.md | 主流水线框架 |
-| ../ppt-forge/refs/* | 各阶段详细流程 |
+| huawei-brand.md | 华为视觉规范（色板/字体/图标/间距） |
+| huawei-archetypes.md | 华为典型页型模板 |
+| huawei-density-rules.md | 华为密度标准 |
+| ../../SKILL.md | 主流水线框架 |
+| ../* | 各阶段详细流程 |
