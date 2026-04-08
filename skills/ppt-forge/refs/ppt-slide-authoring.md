@@ -24,7 +24,11 @@
 | 本页目的 | 一句话 | "证明对等判断优于中央编排" |
 | 证据源 | 明确列出 | `03-architecture.md` + git log |
 
-**没有这 6 项 = 不许动手画。**
+**没有这 7 项 = 不许动手画。**
+
+> **ZaraPPT 额外要求**：选择 ZaraPPT 时，还必须确认：
+> - **预设**：从 12 种预设中选择（BOLD SIGNAL / TERMINAL GREEN 等）
+> - **渲染架构**：scroll-snap（原生滚动驱动）
 
 ## 制作流程
 
@@ -69,6 +73,14 @@
 - [ ] 0 overflow？（`el.scrollHeight > el.clientHeight + 2` 全 slide 扫描）
 - [ ] 图片路径在 HTTP server 环境下能正常加载？
 - [ ] 渲染截图已保存？（自检必须截图看一遍再交活）
+
+### ZaraPPT 专项检查（当品牌=ZaraPPT 时必须检查）
+
+- [ ] **视口检查**：每个 `.slide` 有 `height: 100vh; height: 100dvh; overflow: hidden`
+- [ ] **字体检查**：用了 Fontshare/Google Fonts（`<link>` 标签），没有使用系统字体
+- [ ] **动画检查**：动画通过 `.visible` class + IntersectionObserver 触发
+- [ ] **Scroll Snap 检查**：`html` 有 `scroll-snap-type: y mandatory`
+- [ ] **SlidePresentation JS**：包含键盘/触摸/进度条导航
 
 ## 素材使用
 

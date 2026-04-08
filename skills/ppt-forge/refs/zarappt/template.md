@@ -1,6 +1,19 @@
 # ZaraPPT 风格模板
 
 > ZaraPPT 是面向前端技术分享的轻量级 PPT 风格，提供 12 种视觉预设和现代化的交互动画。
+> 基于 frontend-slides 核心原则：Zero-dependency 单文件 HTML + 强制视口适配 + SlidePresentation JS 类。
+
+## 核心原则（来自 frontend-slides）
+
+**这些原则是 ZaraPPT 的基础，必须遵守：**
+
+| 原则 | 说明 | 必须遵守 |
+|------|------|---------|
+| Zero-dependency | 单 HTML 文件，内联 CSS/JS，无 npm 无构建工具 | ✅ |
+| Viewport Fitting | 每个 `.slide` 必须精确适配 100vh，禁止 slide 内滚动 | ✅ |
+| Fontshare/Google Fonts | 必须用在线字体，禁止系统字体 | ✅ |
+| clamp() 字号 | 所有字号必须用 `clamp(min, preferred, max)` | ✅ |
+| .visible 动画触发 | 动画通过 IntersectionObserver 添加 `.visible` 类触发 | ✅ |
 
 ## 风格定位
 
@@ -10,41 +23,37 @@
 | 视觉特征 | 现代化、代码友好、动画丰富 |
 | 预设数量 | 12 种风格预设 |
 | 动画支持 | CSS entrance + background + interactive |
+| 渲染架构 | 滚动驱动（scroll-snap） |
 
-## 核心 CSS 变量
+## 视口适配规则（强制性）
+
+详见 `zarappt-viewport.css` —— 每个 `.slide` 必须包含：
 
 ```css
-:root {
-  /* 通用视口参数 */
-  --slide-width: 1280px;
-  --slide-height: 720px;
-  --viewport-fit: auto;
-
-  /* 字号体系 */
-  --font-title: clamp(24px, 4vw, 48px);
-  --font-subtitle: clamp(16px, 2.5vw, 28px);
-  --font-body: clamp(12px, 1.8vw, 20px);
-  --font-code: clamp(10px, 1.4vw, 16px);
-  --font-note: clamp(8px, 1.2vw, 14px);
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* 动态视口高度，适配移动端浏览器 */
+    overflow: hidden; /* 关键：禁止 slide 内滚动 */
+    scroll-snap-align: start;
 }
 ```
 
-## 视口适配规则
+**违反视口规则 = 布局 bug，必须修复。**
 
-viewport-base.css 提供了强制性的视口适配，必须引入：
+## 字体规范
 
-```html
-<link rel="stylesheet" href="refs/zarappt/zarappt-viewport.css">
-```
+**禁止使用系统字体**，必须使用 Fontshare 或 Google Fonts：
 
-### 响应式断点
-
-| 断点 | 宽度范围 | 字号策略 |
-|------|---------|---------|
-| 900px+ | 大屏/投影 | 固定字号，100% scale |
-| 700px | 笔记本 | 90% scale |
-| 600px | 小笔记本 | 85% scale |
-| 500px | 平板/手机 | 75% scale，竖屏警告 |
+| 预设 | Display Font | Body Font | 来源 |
+|------|-------------|-----------|------|
+| Bold Signal | Archivo Black | Space Grotesk | Google |
+| Electric Studio | Manrope | Manrope | Google |
+| Creative Voltage | Syne | Space Mono | Google |
+| Dark Botanical | Cormorant | IBM Plex Sans | Google |
+| Terminal Green | JetBrains Mono | JetBrains Mono | JetBrains |
+| Swiss Modern | Archivo | Nunito | Google |
+| ... | ... | ... | ... |
 
 ## 12 种视觉预设
 
@@ -77,55 +86,39 @@ viewport-base.css 提供了强制性的视口适配，必须引入：
 2. **Background Effects** — 背景动效（gradient shift, particle）
 3. **Interactive Effects** — 交互反馈（hover, click, keyboard）
 
-### 使用方式
+### .visible 触发机制
 
-```html
-<!-- 入口动画：slide in from left -->
-<div class="anim-slide-in">内容</div>
+动画通过 IntersectionObserver 添加 `.visible` 类触发：
 
-<!-- 背景动画：gradient shift -->
-<div class="anim-gradient-shift">背景</div>
+```css
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
 
-<!-- 交互：hover 放大 -->
-<div class="anim-hover-zoom">可交互元素</div>
+.slide.visible .reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
 ```
 
-## 视差滚动幻灯片
+## HTML 架构规范
 
-ZaraPPT 支持基于 scroll 的视差幻灯片：
+详见 `html-template.md` —— 完整的 HTML 模板和 SlidePresentation JS 类。
 
-```javascript
-const presentation = new SlidePresentation({
-  scrollContainer: document.getElementById('scroll-container'),
-  slideCount: 10,
-  useParallax: true,
-  parallaxStrength: 0.3
-});
-```
+### SlidePresentation JS 类功能
 
-## 代码高亮
-
-使用 Prism.js 风格的代码高亮：
-
-```html
-<pre><code class="language-javascript">const fn = () => 'code';</code></pre>
-```
-
-## 快捷键
-
-| 键 | 功能 |
-|----|------|
-| `←` `→` | 上下翻页 |
-| `Space` | 下一页 |
-| `Home` `End` | 首页/末页 |
-| `Esc` | 退出全屏 |
-| `P` | 演讲者模式 |
+- 键盘导航（方向键、Space、Page Up/Down）
+- 触摸/滑动支持
+- 滚动进度条
+- 导航点
 
 ## 导出与部署
 
 详见 ppt-forge/ppt-delivery.md
 
-- **HTML 单文件**：reveal.js 封装所有 slides
+- **HTML 单文件**：reveal.js 封装所有 slides（不推荐，优先用原生滚动）
 - **PPTX 导出**：python-pptx 转换脚本
 - **PDF 导出**：Playwright 渲染脚本
 - **在线部署**：Vercel 一键部署脚本
@@ -136,6 +129,6 @@ ZaraPPT 作为 ppt-forge 的品牌模板层：
 
 1. **P 阶段**：选择 zarappt 作为品牌
 2. **S 阶段**：从 12 种预设中选择风格
-3. **A 阶段**：使用 viewport CSS + 动画系统制作
-4. **R 阶段**：按预设风格审查
+3. **A 阶段**：使用 viewport CSS + 动画系统 + SlidePresentation JS
+4. **R 阶段**：按预设风格审查（视口、字体、动画触发）
 5. **E/D 阶段**：导出 HTML/PPTX 单文件交付

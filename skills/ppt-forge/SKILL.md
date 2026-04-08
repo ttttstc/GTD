@@ -158,12 +158,27 @@ description: |
 | 品牌 | 模板路径 | 特征 |
 |------|---------|------|
 | 华为 | refs/huawei/template.md | 红/黑/灰、直角体系、高密度 |
-| ZaraPPT | refs/zarappt/template.md | 12种预设、动画丰富、代码友好 |
+| ZaraPPT | refs/zarappt/template.md | 12种预设、滚动驱动、SlidePresentation JS、Fontshare字体 |
 | Apple | （待扩展） | 极简、大量留白 |
 | 阿里 | （待扩展） | 橙/科技蓝、Dashboard |
 | 通用 | — | 可配置，根据 brief 调整 |
 
 **使用**：开局参数选择品牌后 → S 阶段风格定调时使用对应模板的 CSS 变量
+
+### ZaraPPT 特殊说明
+
+选择 ZaraPPT 时，**必须继承 frontend-slides 核心原则**：
+
+| 原则 | 要求 |
+|------|------|
+| Zero-dependency | 单 HTML 文件，内联 CSS/JS，无外部依赖 |
+| 强制视口适配 | 每个 `.slide` 必须 `height: 100vh; overflow: hidden` |
+| Fontshare 字体 | 禁止系统字体，必须用在线字体 |
+| clamp() 字号 | 所有字号必须用 `clamp(min, preferred, max)` |
+| .visible 动画 | 动画通过 IntersectionObserver + `.visible` 类触发 |
+| SlidePresentation JS | 必须包含键盘/触摸/进度条导航 |
+
+详见 `refs/zarappt/html-template.md`
 
 ## 参考文档
 
@@ -182,3 +197,4 @@ description: |
 | refs/zarappt/zarappt-presets.md | 12 种视觉预设 |
 | refs/zarappt/zarappt-viewport.css | 视口适配 CSS |
 | refs/zarappt/zarappt-animation.md | 动画系统 |
+| refs/zarappt/html-template.md | HTML 架构规范 + SlidePresentation JS |
